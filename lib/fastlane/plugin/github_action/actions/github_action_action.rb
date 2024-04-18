@@ -1,4 +1,5 @@
 require 'fastlane/action'
+require 'date'
 require_relative '../helper/github_actions_helper'
 
 module Fastlane
@@ -151,9 +152,11 @@ module Fastlane
 
         require 'sshkey'
         k = SSHKey.generate()
+        current_time = DateTime.now
+        formatted_time = current_time.strftime "%d/%m/%Y %H:%M"
 
         body = {
-          title: deploy_key_title,
+          title: "#{deploy_key_title}_#{formatted_time}",
           key: k.ssh_public_key,
           read_only: !params[:writable_deploy_key]
         }
