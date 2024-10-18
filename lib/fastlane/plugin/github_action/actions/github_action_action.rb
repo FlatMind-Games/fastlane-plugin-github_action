@@ -19,8 +19,8 @@ module Fastlane
         "MATCH_DEPLOY_KEY"  
       end
 
-      def self.deploy_key_title
-        "Match Deploy Key (created by fastlane-plugin-github_actions)"
+      def self.deploy_key_title(suffix, base_title = "Match Deploy Key (fastlane-plugin-github_actions) for")
+        "#{base_title} #{suffix}"
       end
       
       def self.check_for_setup_ci_in_fastfile
@@ -138,22 +138,17 @@ module Fastlane
         sleep(1)
 
         deploy_keys = get_deploy_keys_resp[:json] || []
+        existing_deploy_key_title = deploy_key_title(ENV["GITHUB_REPOSITORY"])
         deploy_keys.each do |deploy_key|
-          if deploy_key["title"] == deploy_key_title
-            if UI.confirm("Deploy Key for the match repo already exists... Delete it?")
-              self.match_repo_delete(params, "/keys/#{deploy_key["id"]}")
-              UI.message("Deleted existing Deploy Key")
-              sleep(1)
-            else
-              return {}
-            end
+          if deploy_key["title"] == existing_deploy_key_title
+            self.match_repo_delete(params, "/keys/#{deploy_key["id"]}")
+            UI.message("Deleted existing Deploy Key")
+            sleep(1)
           end
         end
 
         require 'sshkey'
         k = SSHKey.generate()
-        current_time = DateTime.now
-        formatted_time = current_time.strftime "%d/%m/%Y %H:%M"
 
         body = {
           title: "#{deploy_key_title}_#{formatted_time}",
