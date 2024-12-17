@@ -138,7 +138,7 @@ module Fastlane
         sleep(1)
 
         deploy_keys = get_deploy_keys_resp[:json] || []
-        existing_deploy_key_title = deploy_key_title(ENV["GITHUB_REPOSITORY"])
+        existing_deploy_key_title = deploy_key_title("#{params[:match_org]}-#{params[:match_repo]}")
         deploy_keys.each do |deploy_key|
           if deploy_key["title"] == existing_deploy_key_title
             self.match_repo_delete(params, "/keys/#{deploy_key["id"]}")
