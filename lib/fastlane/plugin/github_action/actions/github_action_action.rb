@@ -138,9 +138,9 @@ module Fastlane
         sleep(1)
 
         deploy_keys = get_deploy_keys_resp[:json] || []
-        existing_deploy_key_title = deploy_key_title("#{params[:match_org]}-#{params[:match_repo]}")
+        deploy_key_title_generated = deploy_key_title("#{params[:org]}-#{params[:repo]}")
         deploy_keys.each do |deploy_key|
-          if deploy_key["title"] == existing_deploy_key_title
+          if deploy_key["title"] == deploy_key_title_generated
             self.match_repo_delete(params, "/keys/#{deploy_key["id"]}")
             UI.message("Deleted existing Deploy Key")
             sleep(1)
@@ -151,7 +151,7 @@ module Fastlane
         k = SSHKey.generate()
 
         body = {
-          title: "#{deploy_key_title}_#{formatted_time}",
+          title: deploy_key_title_generated,
           key: k.ssh_public_key,
           read_only: !params[:writable_deploy_key]
         }
